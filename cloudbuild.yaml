@@ -95,9 +95,6 @@ steps:
 
 
 
-images:
-- $_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/$_API_SVC:$COMMIT_SHA
-- $_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/$_UI_SVC:$COMMIT_SHA
 
 
 
@@ -140,3 +137,7 @@ images:
       job.submit()
       print(f"Pipeline submitted: {job.resource_name}")
       EOF
+
+images:
+- $_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/$_API_SVC:$COMMIT_SHA
+- $_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/$_UI_SVC:$COMMIT_SHA
