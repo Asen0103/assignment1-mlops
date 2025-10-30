@@ -98,3 +98,45 @@ steps:
 images:
 - $_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/$_API_SVC:$COMMIT_SHA
 - $_LOCATION-docker.pkg.dev/$PROJECT_ID/$_REPOSITORY/$_UI_SVC:$COMMIT_SHA
+
+
+
+# ---- Execute ML Training Pipeline ----
+- name: gcr.io/google.com/cloudsdktool/cloud-sdk
+  id: SUBMIT_VERTEX_PIPELINE
+  entrypoint: bash
+  args:
+    - -c
+    - |
+      set -euo pipefail
+      
+      # Install required Python packages
+      pip install kfp google-cloud-aiplatform
+      
+      # Submit the pipeline to Vertex AI
+      python - <<EOF
+      from google.cloud import aiplatform
+      
+      aiplatform.init(
+          project='$PROJECT_ID',
+          location='$_LOCATION'
+      )
+      
+      # Create pipeline job
+      job = aiplatform.PipelineJob(
+          display_name='banknote-training-pipeline',
+          template_path='cloudbuild-mlops.yaml',
+          pipeline_root='gs://ass1_temp_bucket',
+          enable_caching=False,
+          parameter_values={
+              'project_id': '$PROJECT_ID',
+              'data_bucket': 'gs://ass1_data_bucket',
+              'model_repo': 'gs://ass1_model_bucket',
+              'model_bucket_metadata': 'gs://ass1_model_bucket/model_metadata.json'
+          }
+      )
+      
+      # Run the pipeline
+      job.submit()
+      print(f"Pipeline submitted: {job.resource_name}")
+      EOF
