@@ -107,11 +107,16 @@ steps:
     - |
       set -euo pipefail
       
+      # Create and activate virtual environment
+      python3 -m venv /tmp/venv
+      source /tmp/venv/bin/activate
+      
       # Install required Python packages
+      pip install --upgrade pip
       pip install kfp google-cloud-aiplatform
       
       # Submit the pipeline to Vertex AI
-      python - <<EOF
+      python <<EOF
       from google.cloud import aiplatform
       
       aiplatform.init(
